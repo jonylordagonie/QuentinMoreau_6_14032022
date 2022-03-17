@@ -1,11 +1,15 @@
 const express = require("express");
 
+require("dotenv").config();
+const dataBase = process.env.DATA_BASE;
+
+
 const mongoose = require("mongoose");
 const path = require("path");
 
 mongoose
   .connect(
-    "mongodb+srv://OCadmin:g4BYVzmsjTVkxTA0@cluster0.pmjgh.mongodb.net/P6_OC?retryWrites=true&w=majority",
+    dataBase,
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => console.log("Connexion à MongoDB réussie !"))

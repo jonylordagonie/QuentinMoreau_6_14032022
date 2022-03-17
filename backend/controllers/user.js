@@ -1,23 +1,39 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+require("dotenv").config();
+const tokenkey = process.env.TOKEN;
+
 const User = require("../models/User");
 
+const Joi = require("joi");
+
+const schema = Joi.object({
+  email: Joi.string().regex(/^[\w.-]+[@]{1}[a-zA-Z0-9-.]+[.]{1}[a-z]{1,6}$/),
+  password: Joi.string().pattern(new RegExp(/^[\w.]{8,30}$/)),
+});
+
 exports.signup = (req, res, next) => {
-  bcrypt
-    .hash(req.body.password, 10)
-    .then((hash) => {
-      const user = new User({
-        email: req.body.email,
-        password: hash,
-      });
-      user
-        .save()
-        .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-        .catch((error) => res.status(400).json({ error }));
-    })
-    .catch((error) => res.status(500).json({ error }));
-};
+  schema.validateAsync({
+    email: req.body.email,
+    password: req.body.password,
+  })
+  .then((data) => {
+    bcrypt.hash(req.body.password, 10)
+      .then((hash) => {
+        const user = new User({
+          email: req.body.email,
+          password: hash,
+        });
+        user
+          .save()
+          .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
+          .catch((error) => res.status(400).json({ error }));
+      })
+      .catch((error) => res.status(500).json({ error }));
+  })
+  .catch((error) => res.status(400).json({ error }));
+}
 
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
@@ -33,7 +49,7 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+            token: jwt.sign({ userId: user._id }, tokenkey, {
               expiresIn: "24h",
             }),
           });
