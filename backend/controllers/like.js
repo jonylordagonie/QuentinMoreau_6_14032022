@@ -1,30 +1,26 @@
 const Sauce = require("../models/Sauce");
-const jwt = require("jsonwebtoken");
 
 exports.sauceLike = (req, res, next) => {
   const like = req.body.like;
   if (like == 1) {
-    Sauce.findOne({ _id: req.params.id })
-      .then((sauce) => {
-        const likesArray = sauce.usersLiked
-        if (
-          !likesArray.includes(req.auth.userId) &&
-          !likesArray.includes(req.auth.userId)
-        ) {
-          likesArray.push(req.auth.userId);
-          console.log(req.auth.userId);
-          sauce.likes++;
-          console.log(sauce.usersLiked)
-          return sauce
-            .save()
-            .then(() => res.status(201).json({ message: "Liked !" }))
-            .catch((error) => res.status(500).json({ error }));
-        }
-    })
+    Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+      const likesArray = sauce.usersLiked;
+      if (
+        !likesArray.includes(req.auth.userId) &&
+        !likesArray.includes(req.auth.userId)
+      ) {
+        likesArray.push(req.auth.userId);
+        sauce.likes++;
+
+        return sauce
+          .save()
+          .then(() => res.status(201).json({ message: "Liked !" }))
+          .catch((error) => res.status(500).json({ error }));
+      }
+    });
   }
   if (like == -1) {
-    Sauce.findOne({ _id: req.params.id })
-      .then((sauce) => {
+    Sauce.findOne({ _id: req.params.id }).then((sauce) => {
       if (
         !sauce.usersLiked.includes(req.auth.userId) &&
         !sauce.usersDisliked.includes(req.auth.userId)
@@ -36,14 +32,13 @@ exports.sauceLike = (req, res, next) => {
           .save()
           .then(() => res.status(201).json({ message: "Disliked !" }))
           .catch((error) => res.status(500).json({ error }));
-        }
-      });
+      }
+    });
   }
   if (like == 0) {
-    Sauce.findOne({ _id: req.params.id })
-      .then((sauce) => {
-        const likesArray = sauce.usersLiked;
-        const dislikesArray = sauce.usersDisliked;
+    Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+      const likesArray = sauce.usersLiked;
+      const dislikesArray = sauce.usersDisliked;
       if (likesArray.includes(req.auth.userId)) {
         likesArray.splice(likesArray.indexOf(req.auth.userId), 1);
         sauce.likes--;

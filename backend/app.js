@@ -3,15 +3,11 @@ const express = require("express");
 require("dotenv").config();
 const dataBase = process.env.DATA_BASE;
 
-
 const mongoose = require("mongoose");
 const path = require("path");
 
 mongoose
-  .connect(
-    dataBase,
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+  .connect(dataBase, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"));
 
