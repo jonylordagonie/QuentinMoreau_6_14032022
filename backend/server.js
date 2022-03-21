@@ -1,20 +1,12 @@
+// On require les requete http et notre app
 const http = require("http");
 const app = require("./app");
 
-const normalizePort = (val) => {
-  const port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    return val;
-  }
-  if (port >= 0) {
-    return port;
-  }
-  return false;
-};
+// On dis sur quel port nous voulons utiliser le serveur
 const port = 3000;
 app.set("port", port);
 
+// Recherche les différentes erreurs et les gère de manière appropriée.
 const errorHandler = (error) => {
   if (error.syscall !== "listen") {
     throw error;
@@ -36,8 +28,10 @@ const errorHandler = (error) => {
   }
 };
 
+// On créer notre server
 const server = http.createServer(app);
 
+// Quand le server s'allume affiche l'erreur ou "Listning on port ..."
 server.on("error", errorHandler);
 server.on("listening", () => {
   const address = server.address();
@@ -45,4 +39,5 @@ server.on("listening", () => {
   console.log("Listening on " + bind);
 });
 
+// On execute notre fonction
 server.listen(port);
